@@ -15,7 +15,7 @@ metafile = fileread(fullfile(dataDir, metaFilename));
 meta = jsondecode(metafile);
 
 % Load neural data
-data = fread(fopen(datasource, 'r'), meta.dataShape, '*int16'); 
+data = fread(fopen(datasource, 'r'), meta.dataShape, '*int16');
 
 % Load event data
 load(fullfile(dataDir, 'eventData_G6_2023_04_07.mat'))
@@ -39,12 +39,16 @@ for bb = 1:length(splitTrials) - 1
     tmp = filtfilt(b, a, double(data(:, dataIdx)));
 
     % Save data
-    outputPath = fullfile(dataDir, sprintf('raw_trial_%i-%i_%s_%s.bin', splitTrials(bb) + 1, splitTrials(bb + 1), meta.chamberLoc, sessionDate));
+    if bb == 1
+        outputPath = fullfile(dataDir, sprintf('filt_trial_%i-%i_%s_%s.bin', splitTrials(bb), splitTrials(bb + 1), meta.chamberLoc, sessionDate));
+    else
+        outputPath = fullfile(dataDir, sprintf('filt_trial_%i-%i_%s_%s.bin', splitTrials(bb) + 1, splitTrials(bb + 1), meta.chamberLoc, sessionDate));
+    end
     % outputPath = fullfile('./', sprintf('raw_trial_%i-%i_%s_%s.bin', splitTrials(bb), splitTrials(bb + 1), meta.chamberLoc, sessionDate));
 
     fid = fopen(outputPath, 'w');
 
-
+    fwrite(fid, tmp, 'int16');
     % fwrite(fid, data(:, dataIdx), 'int16');
     fclose(fid);
 end
